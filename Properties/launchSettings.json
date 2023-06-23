@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "TokenizingTextBoxDemo (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "TokenizingTextBoxDemo (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}
