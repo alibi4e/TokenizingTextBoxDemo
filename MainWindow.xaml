@@ -4,9 +4,7 @@
 <Window x:Class="TokenizingTextBoxDemo.MainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d">
+    xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls">
     <Grid x:Name="MainGrid" Margin="40 40 40 40">
         <Grid.Resources>
             <DataTemplate x:Key="EmailTokenTemplate">
