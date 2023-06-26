@@ -23,7 +23,7 @@
                 MaxHeight="104"
                 HorizontalAlignment="Stretch"
                 ItemsSource="{Binding SelectedEmails}" PlaceholderText="Enter email address..."
-                SuggestedItemTemplate="{StaticResource EmailTokenTemplate}" TokenDelimiter=","
+                SuggestedItemTemplate="{StaticResource EmailTokenTemplate}"
                 TokenItemTemplate="{StaticResource EmailTokenTemplate}" />
             <ItemsControl ItemTemplate="{StaticResource EmailTokenTemplate}" ItemsSource="{Binding SelectedTokens}" />
         </StackPanel>
