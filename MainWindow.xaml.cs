@@ -31,7 +31,7 @@ namespace TokenizingTextBoxDemo
 
         private AdvancedCollectionView _acv;
 
-        public ObservableCollection<EmailInfo> SelectedTokens { get; set; }
+        public ObservableCollection<EmailInfo> SelectedEmails { get; set; }
 
         public MainWindow()        
         {
@@ -46,7 +46,7 @@ namespace TokenizingTextBoxDemo
 
         public void OnXamlRendered(FrameworkElement control)
         {
-            SelectedTokens = new();
+            SelectedEmails = new();
 
             control.DataContext = this;
 
