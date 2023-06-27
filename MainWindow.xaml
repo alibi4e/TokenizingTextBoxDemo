@@ -28,7 +28,6 @@
             </Border>
         </ScrollViewer>
 
-
         <ItemsControl Grid.Row="1" Margin="5" ItemTemplate="{StaticResource EmailTokenTemplate}" ItemsSource="{Binding SelectedEmails}" />
     </Grid>
 
