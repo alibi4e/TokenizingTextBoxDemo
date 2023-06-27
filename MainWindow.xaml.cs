@@ -12,7 +12,6 @@ using System.Linq;
 
 namespace TokenizingTextBoxDemo
 {
-
     public sealed partial class MainWindow : Window
     {
         private readonly List<EmailInfo> _samples = new List<EmailInfo>()
@@ -41,7 +40,7 @@ namespace TokenizingTextBoxDemo
 
             _acv.SortDescriptions.Add(new SortDescription(nameof(EmailInfo.EmailAddress), SortDirection.Ascending));
 
-            MainGrid.Loaded += (sender, e) => { this.OnXamlRendered(this.MainGrid); };
+            MainGrid.Loaded += (sender, e) => { this.OnXamlRendered(this.MainGrid); };            
         }
 
         public void OnXamlRendered(FrameworkElement control)
@@ -52,8 +51,7 @@ namespace TokenizingTextBoxDemo
 
             if (_ttb != null)
             {
-                _ttb.TokenItemAdded -= TokenItemAdded;
-                _ttb.TokenItemRemoving -= TokenItemRemoved;
+
                 _ttb.TextChanged -= TextChanged;
                 _ttb.TokenItemAdding -= TokenItemCreating;
             }
@@ -61,13 +59,12 @@ namespace TokenizingTextBoxDemo
             if (control.FindChild("TokenBox") is TokenizingTextBox ttb)
             {
                 _ttb = ttb;
-                _ttb.TokenItemAdded += TokenItemAdded;
-                _ttb.TokenItemRemoving += TokenItemRemoved;
                 _ttb.TextChanged += TextChanged;
                 _ttb.TokenItemAdding += TokenItemCreating;
 
                 _acv.Filter = item => !_ttb.Items.Contains(item) && (item as EmailInfo).EmailAddress.Contains(_ttb.Text, System.StringComparison.CurrentCultureIgnoreCase);
 
+                _ttb.ItemsSource = SelectedEmails;
                 _ttb.SuggestedItemsSource = _acv;
             }
         }
@@ -90,30 +87,6 @@ namespace TokenizingTextBoxDemo
                 {
                     EmailAddress = e.TokenText                    
                 };
-            }
-        }
-
-        private void TokenItemAdded(TokenizingTextBox sender, object data)
-        {
-            if (data is EmailInfo sample)
-            {
-                Debug.WriteLine("Added Token: " + sample.EmailAddress);
-            }
-            else
-            {
-                Debug.WriteLine("Added Token: " + data);
-            }
-        }
-
-        private void TokenItemRemoved(TokenizingTextBox sender, TokenItemRemovingEventArgs args)
-        {
-            if (args.Item is EmailInfo sample)
-            {
-                Debug.WriteLine("Removed Token: " + sample.EmailAddress);
-            }
-            else
-            {
-                Debug.WriteLine("Removed Token: " + args.Item);
             }
         }
 
