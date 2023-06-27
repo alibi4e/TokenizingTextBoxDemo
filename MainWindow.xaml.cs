@@ -7,14 +7,77 @@ using CommunityToolkit.WinUI.UI;
 using CommunityToolkit.WinUI.UI.Controls;
 using Microsoft.UI.Xaml.Controls;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
+using System.Collections;
+using System;
 
 namespace TokenizingTextBoxDemo
 {
+    public class TokenizingTextBox : CommunityToolkit.WinUI.UI.Controls.TokenizingTextBox
+    {
+        private AdvancedCollectionView advancedCollectionView;
+
+        public object SuggestedItems
+        {
+            get { return GetValue(SuggestedItemsProperty); }
+            set { SetValue(SuggestedItemsProperty, value); }
+        }
+        
+        public static readonly DependencyProperty SuggestedItemsProperty =
+            DependencyProperty.Register("SuggestedItemsProperty", typeof(object), typeof(TokenizingTextBox), new PropertyMetadata(default(object)));
+
+        public object ChoosenItems
+        {
+            get { return GetValue(ChoosenItemsProperty); }
+            set { SetValue(ChoosenItemsProperty, value); }
+        }
+        
+        public static readonly DependencyProperty ChoosenItemsProperty =
+            DependencyProperty.Register("ChoosenItems", typeof(object), typeof(TokenizingTextBox), new PropertyMetadata(default(object)));
+
+        public Predicate<object> Filter
+        {
+            get { return (Predicate<object>)GetValue(FilterProperty); }
+            set { SetValue(FilterProperty, value); }
+        }
+
+        public static readonly DependencyProperty FilterProperty =
+            DependencyProperty.Register("Filter", typeof(Predicate<object>), typeof(TokenizingTextBox), new PropertyMetadata(default(Predicate<object>)));
+
+        public IList<SortDescription> SuggestedItemsSortDescriptions
+        {
+            get { return (IList<SortDescription>)GetValue(SuggestedItemsSortDescriptionsProperty); }
+            set { SetValue(SuggestedItemsSortDescriptionsProperty, value); }
+        }
+        
+        public static readonly DependencyProperty SuggestedItemsSortDescriptionsProperty =
+            DependencyProperty.Register("SuggestedItemsSortDescriptions", typeof(IList<SortDescription>), typeof(TokenizingTextBox), new PropertyMetadata(default(IList<SortDescription>)));
+
+        public TokenizingTextBox()
+        {
+            SuggestedItemsSortDescriptions = new List<SortDescription>();
+            Loaded += (sender, e) => {
+                advancedCollectionView = new AdvancedCollectionView((IList)SuggestedItems, false);      
+                SuggestedItemsSortDescriptions.ToList().ForEach(sortDescription => advancedCollectionView.SortDescriptions.Add(sortDescription));                
+                advancedCollectionView.Filter = Filter;
+                TextChanged += OnTextChanged;
+                ItemsSource = ChoosenItems;
+                SuggestedItemsSource = advancedCollectionView;
+            };
+        }
+
+        private void OnTextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
+        {
+            if (args.CheckCurrent() && args.Reason == AutoSuggestionBoxTextChangeReason.UserInput)
+            {
+                advancedCollectionView.RefreshFilter();
+            }
+        }
+    }
+
     public sealed partial class MainWindow : Window
     {
-        private readonly List<EmailInfo> _samples = new List<EmailInfo>()
+        public List<EmailInfo> Samples = new()
         {
             new EmailInfo() { EmailAddress = "bilal.ali@bluejeans.com" },
             new EmailInfo() { EmailAddress = "parvez@bluejeans.com" },
@@ -25,61 +88,20 @@ namespace TokenizingTextBoxDemo
             new EmailInfo() { EmailAddress = "kateryna.novak@bluejeans.com" },
             new EmailInfo() { EmailAddress = "nanda.doddapaneni@bluejeans.com" }
         };
-
-        private TokenizingTextBox _ttb;        
-
-        private AdvancedCollectionView _acv;
-
+        
         public ObservableCollection<EmailInfo> SelectedEmails { get; set; }
 
         public MainWindow()        
         {
-            InitializeComponent();
-
-            _acv = new AdvancedCollectionView(_samples, false);
-
-            _acv.SortDescriptions.Add(new SortDescription(nameof(EmailInfo.EmailAddress), SortDirection.Ascending));
-
-            MainGrid.Loaded += (sender, e) => { this.OnXamlRendered(this.MainGrid); };            
-        }
-
-        public void OnXamlRendered(FrameworkElement control)
-        {
+            InitializeComponent();                     
             SelectedEmails = new();
-
-            control.DataContext = this;
-
-            if (_ttb != null)
-            {
-
-                _ttb.TextChanged -= TextChanged;
-                _ttb.TokenItemAdding -= TokenItemCreating;
-            }
-
-            if (control.FindChild("TokenBox") is TokenizingTextBox ttb)
-            {
-                _ttb = ttb;
-                _ttb.TextChanged += TextChanged;
-                _ttb.TokenItemAdding += TokenItemCreating;
-
-                _acv.Filter = item => !_ttb.Items.Contains(item) && (item as EmailInfo).EmailAddress.Contains(_ttb.Text, System.StringComparison.CurrentCultureIgnoreCase);
-
-                _ttb.ItemsSource = SelectedEmails;
-                _ttb.SuggestedItemsSource = _acv;
-            }
-        }
-
-        private void TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
-        {
-            if (args.CheckCurrent() && args.Reason == AutoSuggestionBoxTextChangeReason.UserInput)
-            {
-                _acv.RefreshFilter();
-            }
+            ZionTokenizingTextBox.Filter = item => !ZionTokenizingTextBox.Items.Contains(item) && (item as EmailInfo).EmailAddress.Contains(ZionTokenizingTextBox.Text, System.StringComparison.CurrentCultureIgnoreCase);
+            ZionTokenizingTextBox.SuggestedItemsSortDescriptions.Add(new SortDescription(nameof(EmailInfo.EmailAddress), SortDirection.Ascending));
         }
 
         private void TokenItemCreating(object sender, TokenItemAddingEventArgs e)
         {
-            e.Item = _samples.FirstOrDefault((item) => item.EmailAddress.Contains(e.TokenText, System.StringComparison.CurrentCultureIgnoreCase));
+            e.Item = Samples.FirstOrDefault((item) => item.EmailAddress.Contains(e.TokenText, StringComparison.CurrentCultureIgnoreCase));
 
             if (e.Item == null)
             {
@@ -88,12 +110,6 @@ namespace TokenizingTextBoxDemo
                     EmailAddress = e.TokenText                    
                 };
             }
-        }
-
-        private async void ClearButtonClick(object sender, RoutedEventArgs e)
-        {            
-            _acv.RefreshFilter();
-            await _ttb.ClearAsync();
         }
     }
 }

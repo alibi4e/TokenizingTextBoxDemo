@@ -18,21 +18,18 @@
 
         <ScrollViewer Grid.Row="0" Width="400" MaxHeight="200">
             <Border Margin="0 3 0 0" BorderThickness="1" BorderBrush="Black" CornerRadius="4">
-                <controls:TokenizingTextBox x:Name="TokenBox"
+                <tokenizingtextboxdemo:TokenizingTextBox x:Name="ZionTokenizingTextBox"
                     Margin="-2 -10 -2 0"
                     BorderThickness="0"
-                    PlaceholderText="Enter email address..." ScrollViewer.VerticalScrollBarVisibility="Visible"
-                    SuggestedItemTemplate="{StaticResource EmailTokenTemplate}"
-                    TokenItemTemplate="{StaticResource EmailTokenTemplate}" />
+                    ChoosenItems="{x:Bind SelectedEmails}" PlaceholderText="Enter email address..."
+                    ScrollViewer.VerticalScrollBarVisibility="Visible"
+                    SuggestedItemTemplate="{StaticResource EmailTokenTemplate}" SuggestedItems="{x:Bind Samples}"
+                    TokenItemAdding="TokenItemCreating" TokenItemTemplate="{StaticResource EmailTokenTemplate}" />
             </Border>
         </ScrollViewer>
 
 
         <ItemsControl Grid.Row="1" Margin="5" ItemTemplate="{StaticResource EmailTokenTemplate}" ItemsSource="{Binding SelectedEmails}" />
-
-        <StackPanel Grid.Row="3" Margin="5" Orientation="Horizontal" Spacing="10">
-            <Button Click="ClearButtonClick" Content="Clear Tokens" />
-        </StackPanel>
     </Grid>
 
 </Window>
